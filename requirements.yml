@@ -1,0 +1,10 @@
+---
+
+roles:
+  - src: https://github.com/buissetemmanuel/ansible-role-container.git
+    version: v1.0.3
+    name: container
+
+collections:
+  - ansible.netcommon
+  - containers.podman

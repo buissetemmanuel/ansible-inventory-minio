@@ -1,0 +1,266 @@
+---
+
+users_groups:
+  - name: minioug
+  - name: miniougs
+  - name: miniougl
+  - name: miniougal
+users_users:
+  - name: miniouo
+    group: minioug
+    create_home: true
+  - name: miniouos
+    group: miniougs
+    create_home: true
+    groups: miniougl
+  - name: minioual
+    group: miniougal
+    groups: miniougl
+
+container_user_owner: miniouo
+container_user_group: minioug
+container_user_group_logs: miniougl
+container_user_owner_service: miniouos
+container_user_group_service: miniougs
+
+container_pod_name: minio_pod
+
+x-minio-common: &minio-common
+  image_name: quay.io/minio/minio
+  image_tag: RELEASE.2023-05-04T21-44-30Z
+  image_pull_policy: IfNotPresent
+#  command:
+#    - /bin/bash
+#    - -c
+#  args:
+#    - minio server
+#  env:
+#    MINIO_VOLUMES: "http://localhost:900{1...4}/data{1...4}{1...2}"
+#    MINIO_OPTS: "--console-address :9010"
+#    MINIO_SERVER_URL: "https://{{ ansible_fqdn }}:9000"
+#    MINIO_ROOT_USER: "{{ vault_minio_root_user }}"
+#    MINIO_ROOT_PASSWORD: "{{ vault_minio_root_password }}"
+##    MINIO_HTTP_TRACE: "/tmp/minio.log"
+#    PUID: 1002
+#    GUID: 1004
+#  ports:
+#    - containerPort: 9000
+#      hostPort: 9000
+#      protocol: TCP
+#    - containerPort: 9001
+#      hostPort: 9001
+#      protocol: TCP
+  resources:
+    limits:
+      cpu: "1"
+    requests:
+      cpu: "0.5"
+#  healthcheck:
+#    test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+#    interval: 30s
+#    timeout: 20s
+#    retries: 3
+
+container_pod_containers:
+  - name: minio1
+    description: "Minio server 1"
+    <<: *minio-common
+    command:
+      - /bin/bash
+      - -c
+    args:
+      - minio server --address :9001 --console-address :9011
+    env:
+      MINIO_VOLUMES: "http://localhost:9001/data11 http://localhost:9001/data12 http://localhost:9002/data21 http://localhost:9002/data22 http://localhost:9003/data31 http://localhost:9003/data32 http://localhost:9004/data41 http://localhost:9004/data42"
+      MINIO_SERVER_URL: "http://{{ ansible_fqdn }}:9000"
+      MINIO_ROOT_USER: "{{ vault_minio_root_user }}"
+      MINIO_ROOT_PASSWORD: "{{ vault_minio_root_password }}"
+  #    MINIO_HTTP_TRACE: "/tmp/minio.log"
+      PUID: 1002
+      GUID: 1004
+    ports:
+      - containerPort: 9001
+        protocol: TCP
+      - containerPort: 9011
+        protocol: TCP
+    volumeMounts:
+      - mountPath: /data11:rw,z
+        name: data11
+      - mountPath: /data12:rw,z
+        name: data12
+#      - mountPath: /tmp/minio.log:rw,z
+#        name: minio-logs
+  - name: minio2
+    description: "Minio server 2"
+    <<: *minio-common
+    command:
+      - /bin/bash
+      - -c
+    args:
+      - minio server --address :9002
+    env:
+      MINIO_VOLUMES: "http://localhost:9001/data11 http://localhost:9001/data12 http://localhost:9002/data21 http://localhost:9002/data22 http://localhost:9003/data31 http://localhost:9003/data32 http://localhost:9004/data41 http://localhost:9004/data42"
+      MINIO_SERVER_URL: "http://{{ ansible_fqdn }}:9000"
+      MINIO_ROOT_USER: "{{ vault_minio_root_user }}"
+      MINIO_ROOT_PASSWORD: "{{ vault_minio_root_password }}"
+      PUID: 1002
+      GUID: 1004
+    ports:
+      - containerPort: 9002
+        protocol: TCP
+    volumeMounts:
+      - mountPath: /data21:rw,z
+        name: data21
+      - mountPath: /data22:rw,z
+        name: data22
+  - name: minio3
+    description: "Minio server 3"
+    <<: *minio-common
+    command:
+      - /bin/bash
+      - -c
+    args:
+      - minio server --address :9003
+    env:
+      MINIO_VOLUMES: "http://localhost:9001/data11 http://localhost:9001/data12 http://localhost:9002/data21 http://localhost:9002/data22 http://localhost:9003/data31 http://localhost:9003/data32 http://localhost:9004/data41 http://localhost:9004/data42"
+      MINIO_SERVER_URL: "http://{{ ansible_fqdn }}:9000"
+      MINIO_ROOT_USER: "{{ vault_minio_root_user }}"
+      MINIO_ROOT_PASSWORD: "{{ vault_minio_root_password }}"
+      PUID: 1002
+      GUID: 1004
+    ports:
+      - containerPort: 9003
+        protocol: TCP
+      - containerPort: 9013
+        protocol: TCP
+    volumeMounts:
+      - mountPath: /data31:rw,z
+        name: data31
+      - mountPath: /data32:rw,z
+        name: data32
+  - name: minio4
+    description: "Minio server 4"
+    <<: *minio-common
+    command:
+      - /bin/bash
+      - -c
+    args:
+      - minio server --address :9004
+    env:
+      MINIO_VOLUMES: "http://localhost:9001/data11 http://localhost:9001/data12 http://localhost:9002/data21 http://localhost:9002/data22 http://localhost:9003/data31 http://localhost:9003/data32 http://localhost:9004/data41 http://localhost:9004/data42"
+      MINIO_SERVER_URL: "http://{{ ansible_fqdn }}:9000"
+      MINIO_ROOT_USER: "{{ vault_minio_root_user }}"
+      MINIO_ROOT_PASSWORD: "{{ vault_minio_root_password }}"
+      PUID: 1002
+      GUID: 1004
+    ports:
+      - containerPort: 9004
+        protocol: TCP
+      - containerPort: 9014
+        protocol: TCP
+    volumeMounts:
+      - mountPath: /data41:rw,z
+        name: data41
+      - mountPath: /data42:rw,z
+        name: data42
+  - name: nginx
+    description: "Nginx front for Minio"
+    image_name: docker.io/nginx
+    image_tag: 1.19.2-alpine
+    image_pull_policy: IfNotPresent
+    env:
+      PUID: 1002
+      GUID: 1004
+    ports:
+      - containerPort: 9000
+        hostPort: 9000
+        protocol: TCP
+      - containerPort: 9010
+        hostPort: 9010
+        protocol: TCP
+    resources:
+      limits:
+        cpu: "1"
+      requests:
+        cpu: "0.5"
+    volumeMounts:
+      - mountPath: /etc/nginx/nginx.conf:ro,z
+        name: nginx-conf-file
+      - mountPath: /var/log/nginx:rw,z
+        name: nginx-logs
+
+minio_pod_data_dir: "{{ container_pod_home_dir }}/data"
+minio_pod_data11_dir: "{{ minio_pod_data_dir }}/data11"
+minio_pod_data12_dir: "{{ minio_pod_data_dir }}/data12"
+minio_pod_data21_dir: "{{ minio_pod_data_dir }}/data21"
+minio_pod_data22_dir: "{{ minio_pod_data_dir }}/data22"
+minio_pod_data31_dir: "{{ minio_pod_data_dir }}/data31"
+minio_pod_data32_dir: "{{ minio_pod_data_dir }}/data32"
+minio_pod_data41_dir: "{{ minio_pod_data_dir }}/data41"
+minio_pod_data42_dir: "{{ minio_pod_data_dir }}/data42"
+
+minio_pod_nginx_logs_dir: "{{ container_pod_logs_dir }}/nginx"
+
+container_directories:
+  - path: "{{ minio_pod_data_dir }}"
+    owner: "{{ container_user_owner_service }}"
+    group: "{{ container_user_group_service }}"
+    mode: "{{ container_directories_mode }}"
+  - path: "{{ minio_pod_nginx_logs_dir }}"
+    owner: "{{ container_user_owner_service }}"
+    group: "{{ container_user_group_service }}"
+    mode: "{{ container_directories_mode }}"
+
+minio_pod_nginx_conf_file: "{{ container_pod_etc_dir }}/nginx.conf"
+
+container_templates:
+  - src: nginx.conf.j2
+    dest: "{{ minio_pod_nginx_conf_file }}"
+    owner: "{{ container_user_owner_service }}"
+    group: "{{ container_user_group_service }}"
+    mode: "{{ container_files_mode }}"
+
+container_pod_volumes:
+  - name: data11
+    hostPath:
+      path: "{{ minio_pod_data11_dir }}"
+      type: DirectoryOrCreate
+  - name: data12
+    hostPath:
+      path: "{{ minio_pod_data12_dir }}"
+      type: DirectoryOrCreate
+  - name: data21
+    hostPath:
+      path: "{{ minio_pod_data21_dir }}"
+      type: DirectoryOrCreate
+  - name: data22
+    hostPath:
+      path: "{{ minio_pod_data22_dir }}"
+      type: DirectoryOrCreate
+  - name: data31
+    hostPath:
+      path: "{{ minio_pod_data31_dir }}"
+      type: DirectoryOrCreate
+  - name: data32
+    hostPath:
+      path: "{{ minio_pod_data32_dir }}"
+      type: DirectoryOrCreate
+  - name: data41
+    hostPath:
+      path: "{{ minio_pod_data41_dir }}"
+      type: DirectoryOrCreate
+  - name: data42
+    hostPath:
+      path: "{{ minio_pod_data42_dir }}"
+      type: DirectoryOrCreate
+  - name: nginx-conf-file
+    hostPath:
+      path: "{{ minio_pod_nginx_conf_file }}"
+      type: File
+  - name: nginx-logs
+    hostPath:
+      path: "{{ minio_pod_nginx_logs_dir }}"
+      type: DirectoryOrCreate
+#  - name: minio-logs
+#    hostPath:
+#      path: "{{ container_pod_logs_dir }}"
