@@ -1,4 +1,4 @@
-name: MOLECULE LINT
+name: LINT
 
 on:
   push:
