@@ -8,7 +8,7 @@ name: RELEASE
       - main
 
 permissions:
-  contents: read
+  contents: read # for checkout
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
