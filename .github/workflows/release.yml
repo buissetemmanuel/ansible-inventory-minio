@@ -15,7 +15,7 @@ env:
 
 jobs:
   lint:
-    uses: buissetemmanuel/ansible-inventory-minion/.github/workflows/lint.yml@main
+    uses: buissetemmanuel/ansible-inventory-minio/.github/workflows/lint.yml@main
 
   release:
     needs: lint
