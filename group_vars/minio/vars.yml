@@ -50,7 +50,7 @@ container_pod_containers:
     args:
       - minio server --address :9001 --console-address :9011
     env:
-      MINIO_VOLUMES: "http://localhost:9001/data11 http://localhost:9001/data12 http://localhost:9002/data21 http://localhost:9002/data22 http://localhost:9003/data31 http://localhost:9003/data32 http://localhost:9004/data41 http://localhost:9004/data42"
+      MINIO_VOLUMES: "http://localhost:9001/data11 http://localhost:9001/data12"
       MINIO_SERVER_URL: "http://{{ ansible_fqdn }}:9000"
       MINIO_ROOT_USER: "{{ vault_minio_root_user }}"
       MINIO_ROOT_PASSWORD: "{{ vault_minio_root_password }}"
@@ -69,79 +69,6 @@ container_pod_containers:
         name: data12
 #      - mountPath: /tmp/minio.log:rw,z
 #        name: minio-logs
-  - name: minio2
-    description: "Minio server 2"
-    <<: *minio-common
-    command:
-      - /bin/bash
-      - -c
-    args:
-      - minio server --address :9002
-    env:
-      MINIO_VOLUMES: "http://localhost:9001/data11 http://localhost:9001/data12 http://localhost:9002/data21 http://localhost:9002/data22 http://localhost:9003/data31 http://localhost:9003/data32 http://localhost:9004/data41 http://localhost:9004/data42"
-      MINIO_SERVER_URL: "http://{{ ansible_fqdn }}:9000"
-      MINIO_ROOT_USER: "{{ vault_minio_root_user }}"
-      MINIO_ROOT_PASSWORD: "{{ vault_minio_root_password }}"
-      PUID: 1002
-      GUID: 1004
-    ports:
-      - containerPort: 9002
-        protocol: TCP
-    volumeMounts:
-      - mountPath: /data21:rw,z
-        name: data21
-      - mountPath: /data22:rw,z
-        name: data22
-  - name: minio3
-    description: "Minio server 3"
-    <<: *minio-common
-    command:
-      - /bin/bash
-      - -c
-    args:
-      - minio server --address :9003
-    env:
-      MINIO_VOLUMES: "http://localhost:9001/data11 http://localhost:9001/data12 http://localhost:9002/data21 http://localhost:9002/data22 http://localhost:9003/data31 http://localhost:9003/data32 http://localhost:9004/data41 http://localhost:9004/data42"
-      MINIO_SERVER_URL: "http://{{ ansible_fqdn }}:9000"
-      MINIO_ROOT_USER: "{{ vault_minio_root_user }}"
-      MINIO_ROOT_PASSWORD: "{{ vault_minio_root_password }}"
-      PUID: 1002
-      GUID: 1004
-    ports:
-      - containerPort: 9003
-        protocol: TCP
-      - containerPort: 9013
-        protocol: TCP
-    volumeMounts:
-      - mountPath: /data31:rw,z
-        name: data31
-      - mountPath: /data32:rw,z
-        name: data32
-  - name: minio4
-    description: "Minio server 4"
-    <<: *minio-common
-    command:
-      - /bin/bash
-      - -c
-    args:
-      - minio server --address :9004
-    env:
-      MINIO_VOLUMES: "http://localhost:9001/data11 http://localhost:9001/data12 http://localhost:9002/data21 http://localhost:9002/data22 http://localhost:9003/data31 http://localhost:9003/data32 http://localhost:9004/data41 http://localhost:9004/data42"
-      MINIO_SERVER_URL: "http://{{ ansible_fqdn }}:9000"
-      MINIO_ROOT_USER: "{{ vault_minio_root_user }}"
-      MINIO_ROOT_PASSWORD: "{{ vault_minio_root_password }}"
-      PUID: 1002
-      GUID: 1004
-    ports:
-      - containerPort: 9004
-        protocol: TCP
-      - containerPort: 9014
-        protocol: TCP
-    volumeMounts:
-      - mountPath: /data41:rw,z
-        name: data41
-      - mountPath: /data42:rw,z
-        name: data42
   - name: nginx
     description: "Nginx front for Minio"
     image_name: docker.io/nginx
@@ -171,12 +98,6 @@ container_pod_containers:
 minio_pod_data_dir: "{{ container_pod_home_dir }}/data"
 minio_pod_data11_dir: "{{ minio_pod_data_dir }}/data11"
 minio_pod_data12_dir: "{{ minio_pod_data_dir }}/data12"
-minio_pod_data21_dir: "{{ minio_pod_data_dir }}/data21"
-minio_pod_data22_dir: "{{ minio_pod_data_dir }}/data22"
-minio_pod_data31_dir: "{{ minio_pod_data_dir }}/data31"
-minio_pod_data32_dir: "{{ minio_pod_data_dir }}/data32"
-minio_pod_data41_dir: "{{ minio_pod_data_dir }}/data41"
-minio_pod_data42_dir: "{{ minio_pod_data_dir }}/data42"
 
 minio_pod_nginx_logs_dir: "{{ container_pod_logs_dir }}/nginx"
 
@@ -207,30 +128,6 @@ container_pod_volumes:
   - name: data12
     hostPath:
       path: "{{ minio_pod_data12_dir }}"
-      type: DirectoryOrCreate
-  - name: data21
-    hostPath:
-      path: "{{ minio_pod_data21_dir }}"
-      type: DirectoryOrCreate
-  - name: data22
-    hostPath:
-      path: "{{ minio_pod_data22_dir }}"
-      type: DirectoryOrCreate
-  - name: data31
-    hostPath:
-      path: "{{ minio_pod_data31_dir }}"
-      type: DirectoryOrCreate
-  - name: data32
-    hostPath:
-      path: "{{ minio_pod_data32_dir }}"
-      type: DirectoryOrCreate
-  - name: data41
-    hostPath:
-      path: "{{ minio_pod_data41_dir }}"
-      type: DirectoryOrCreate
-  - name: data42
-    hostPath:
-      path: "{{ minio_pod_data42_dir }}"
       type: DirectoryOrCreate
   - name: nginx-conf-file
     hostPath:
